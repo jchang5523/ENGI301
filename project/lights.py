@@ -1,36 +1,70 @@
-#Light PIR sensor
+import time
+
+import Adafruit_BBIO.SPI  as SPI
+import Adafruit_BBIO.GPIO as GPIO
+
+import time
 import board
-dir(board)
+import busio
+import adafruit_veml7700
 
-import digitalio
+i2c = busio.I2C(board.SCL, board.SDA)
+veml7700 = adafruit_veml7700.VEML7700(i2c)
+#print("Ambient light:", veml7700.light)
+#print("Lux:", veml7700.lux)
 
-LED_PIN = board.D13  # Pin number for the board's built in LED.
-PIR_PIN = board.D2   # Pin number connected to PIR sensor output wire.
+# ------------------------------------------------------------------------
+# Global Variables    
+# -----------------------------------------------------------------------
+# Interrupt pin on the PocketBeagle for the Motion Click
+PIR_pin = "P1_02"
 
-# Setup digital input for PIR sensor:
-pir = digitalio.DigitalInOut(PIR_PIN)
-pir.direction = digitalio.Direction.INPUT
+# Time delay between SPI writes
+timeDelay     = 0.00005
 
-# Setup digital output for LED:
-led = digitalio.DigitalInOut(LED_PIN)
-led.direction = digitalio.Direction.OUTPUT
 
-# Main loop that will run forever:
-old_value = pir.value
-while True:
-    pir_value = pir.value
-    if pir_value:
-        # PIR is detecting movement! Turn on LED.
-        led.value = True
-        # Check if this is the first time movement was
-        # detected and print a message!
-        if not old_value:
-            print('Motion detected!')
-    else:
-        # PIR is not detecting movement. Turn off LED.
-        led.value = False
-        # Again check if this is the first time movement
-        # stopped and print a message.
-        if old_value:
-            print('Motion ended!')
-    old_value = pir_value
+# ------------------------------------------------------------------------
+# Demo Functions
+# ------------------------------------------------------------------------
+
+def ledStringRandom(spi_bus):
+    """Generate random colors on LED string"""
+    spi_bus.writebytes([0xFF, 0, 0])
+    time.sleep(timeDelay)
+    
+    spi_bus.writebytes([0, 0xFF, 0])
+    time.sleep(timeDelay)
+# End def
+
+
+def ledStringOff(spi_bus):
+    """Turn off the LED String"""
+    spi_bus.writebytes([0, 0, 0])
+    time.sleep(timeDelay)
+# End def
+
+ 
+# ------------------------------------------------------------------------
+# Main script
+# -------------------------------------------------------------- ----------
+
+if __name__ == '__main__':
+ 
+    # Set up interrupt
+    GPIO.setup(PIR_pin, GPIO.IN)
+
+    # Open the SPI port
+    spi = SPI.SPI(1, 0)
+
+    # Main loop to turn on/off the LED string
+    while(True):
+       if GPIO.input(PIR_pin):
+           ledStringRandom(spi)
+           print("")
+       else:
+           ledStringOff(spi)
+
+    # Clean up the SPI and GPIO
+    spi.close()
+    GPIO.cleanup()
+
