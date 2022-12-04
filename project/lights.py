@@ -60,7 +60,6 @@ if __name__ == '__main__':
     while(True):
        if GPIO.input(PIR_pin):
            ledStringRandom(spi)
-           print("")
        else:
            ledStringOff(spi)
 
