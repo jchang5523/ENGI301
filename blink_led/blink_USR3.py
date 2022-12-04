@@ -37,13 +37,9 @@ import time
 
 #LED setup
 GPIO.setup("USR%d" % 3, GPIO.OUT)
-GPIO.setup("USR%d" % 2, GPIO.OUT)
-GPIO.setup("USR%d" % 1, GPIO.OUT)
 
 #Continuously running
 while True:
-        GPIO.output("USR%d" % 1, GPIO.LOW) 
-        GPIO.output("USR%d" % 2, GPIO.LOW) 
         GPIO.output("USR%d" % 3, GPIO.HIGH)             #LED ON for 0.1 seconds
         time.sleep(0.10)
         GPIO.output("USR%d" % 3, GPIO.LOW)              #LED OFF for 0.1 seconds

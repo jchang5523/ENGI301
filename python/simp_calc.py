@@ -63,6 +63,10 @@ operators = {
     "%": operator.mod,
     "**": operator.__pow__
 }
+try: 
+    input = raw_input
+except NameError:
+    pass
 
 
 
