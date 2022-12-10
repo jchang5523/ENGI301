@@ -3,7 +3,7 @@
 Room Welcoming System
 --------------------------------------------------------------------------
 License:   
-Copyright 2022 <NAME>
+Copyright 2022 <Jonathan Chang>
 
 Redistribution and use in source and binary forms, with or without 
 modification, are permitted provided that the following conditions are met:
@@ -59,6 +59,7 @@ import Adafruit_BBIO.GPIO as GPIO
 import time
 import board
 import busio
+import vlc
 import adafruit_veml7700
 
 
@@ -69,6 +70,14 @@ import adafruit_veml7700
 
 LED_STR_LEN = 240     # Length of the LED string
 
+
+# Turns off LEDs initially
+for i in range(STR_LEN):
+    leds = [(0, 0, 0)] * STR_LEN
+power = False
+
+if not client.put_pixels(leds, channel=0):
+    print ('not connected')  
 
 
 # ------------------------------------------------------------------------
@@ -84,16 +93,12 @@ class RoomWelcomer():
     motion_sensor   = None
     song            = None
     
-    def __init__(self, light_sensor_bus=[board.SCL, board.SDA], motion_sensor_pin="P1_02", song=None):
-        self.led_strip_light =
-        
+    def __init__(self, led_strip_light="P1_08", light_sensor_bus=[board.SCL, board.SDA], motion_sensor_pin="P1_02", song="P1_29"):
+        self.led_strip_light = led_strip_light
         i2c = busio.I2C(board.SCL, board.SDA)
         self.light_sensor    = adafruit_veml7700.VEML7700(i2c)
-
         self.motion_sensor   = motion_sensor_pin
-        
         self.song            = song
-        
         self.setup()
 
     # End def
@@ -102,25 +107,17 @@ class RoomWelcomer():
         """Turn off the LED String"""
         print("Turn LED Strip Off")
         for i in range(STR_LEN):
-                leds = [(0, 0, 0)] * STR_LEN
-                client.put_pixels(leds, channel=0): #sends color array over
+            leds = [(0, 0, 0)] * STR_LEN
+        client.put_pixels(leds, channel=0): #sends color array over
         print ('not connected')
     # End def
 
     
     def play_song(self):
+        audio = "var/lib/cloud9/ENGI301/project/testaudio.mp3"
+        p = vlc.Mediaplayer(audio)
+        p.play()
         print("Play song")
-
-    # End def
-    
-
-    def run(self):
-        # Main loop to turn on/off the LED string
-        while(True):
-           if GPIO.input(self.motion_sensor):
-               self.ledStringOn(spi)
-           else:
-               self.ledStringOff(spi)
         
     # End def
 
@@ -129,9 +126,14 @@ class RoomWelcomer():
         # Setup Motion sensor
         GPIO.setup(self.motion_sensor, GPIO.IN)
 
-        # Setup LED Strip light        
+        # Setup light sensor    
+        GPIO.setup(self.light_sensor, GPIO.IN)
         
-    
+        #setup LED strip
+        GPIO.setup(self.led_strip_light, GPIO.IN)
+
+        #setup speaker
+        GPIO.setup(self.song, GPIO.IN)
     # End def
 
 
@@ -141,11 +143,9 @@ class RoomWelcomer():
         
         # Make sure the LED strip is off
         self.ledStringOff()
-
     # End def
 
     
-    # See example code 
         
     def ledStringOn(spi_bus):
         """Generate colors on LED string based on brightness of room"""
@@ -174,9 +174,22 @@ class RoomWelcomer():
                 leds = [(255, 255, 255)] * STR_LEN #white
                 client.put_pixels(leds, channel=0) 
             time.sleep(timeDelay)
-
-
-
+            
+            
+        def run(self):
+        # Main loop to turn on/off the LED string
+            while(True):
+               if GPIO.input(self.motion_sensor):
+                   if power: #If power is already on, turn off LEDs
+                        self.ledStringOff(spi)
+                        power = False
+                        sd.sleep(300)
+                    else:
+                        self.ledStringOn(spi)
+                        power = True
+                        self.play_song
+                        sd.sleep(300)
+        # End def
 # End class
 
 
