@@ -38,10 +38,11 @@ Use the following hardware components to make a room welcoming system:
   - USB speaker
 
 Requirements:
-
+See https://www.hackster.io/jchang5523/room-welcoming-system-fd27b1
 
 Uses:
-
+This project should welcome one home by playing a welcome sound and turn on LED lights on a ceiling whenever someone enters and turnthem off when and IR sensor is triggered. 
+The LEDs should also automatically adjust their color based on the brightness of the room and a speaker should play a sound file.
 
 """
 
