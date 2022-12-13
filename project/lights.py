@@ -72,14 +72,6 @@ import adafruit_veml7700
 LED_STR_LEN = 240     # Length of the LED string
 
 
-# Turns off LEDs initially
-for i in range(STR_LEN):
-    leds = [(0, 0, 0)] * STR_LEN
-power = False
-
-if not client.put_pixels(leds, channel=0):
-    print ('not connected')  
-
 
 # ------------------------------------------------------------------------
 # Global Variables    
@@ -100,6 +92,7 @@ class RoomWelcomer():
         self.light_sensor    = adafruit_veml7700.VEML7700(i2c)
         self.motion_sensor   = motion_sensor_pin
         self.song            = song
+        self.ledstringOff()
         self.setup()
 
     # End def
@@ -148,7 +141,7 @@ class RoomWelcomer():
 
     
         
-    def ledStringOn(spi_bus):
+    def ledStringOn(self.light_sensor, spi_bus):
         """Generate colors on LED string based on brightness of room"""
         if veml7700.lux < 100
             for i in range(STR_LEN):
